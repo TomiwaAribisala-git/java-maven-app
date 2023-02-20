@@ -1,0 +1,1 @@
+Sample Java Maven App for CI/CD.
