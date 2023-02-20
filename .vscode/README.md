@@ -1,1 +1,1 @@
-Sample Java Maven App for CI/CD.
+Java Maven App for CI/CD.
