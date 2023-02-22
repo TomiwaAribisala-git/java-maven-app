@@ -14,6 +14,7 @@ pipeline {
                     sh 'docker build -t tomiwa97/docker_app:jma-1.1 .'
                     sh "echo $PASS | docker login -u $USER --password-stdin"
                     sh 'docker push tomiwa97/docker_app:jma-1.1'
+                }
             }
         }
         stage("deploy") {
