@@ -4,7 +4,7 @@ pipeline {
         stage("build jar") {
             steps {
                 echo "building the application..."
-                withMaven(maven: 'maven_3_9_0') {
+                withMaven(maven: 'maven-3.9') {
                     sh "mvn package"
                 }
             }
