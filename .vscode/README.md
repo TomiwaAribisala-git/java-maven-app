@@ -1,1 +1,1 @@
-Java Maven App for CI/CD.
+A Java Maven Application(sample) for a CI/CD pipeline.
