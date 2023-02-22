@@ -4,7 +4,9 @@ pipeline {
         stage("build jar") {
             steps {
                 echo "building the application..."
-                sh 'mvn package'
+                withMaven(maven: 'mvn') {
+                    sh "mvn package"
+                }
             }
         }
         stage("build image") {
