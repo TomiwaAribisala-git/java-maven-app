@@ -1,27 +1,41 @@
+#!/usr/bin/env groovy
+
+@Library('jenkins-shared-library')
+
+def gv 
+
 pipeline {
     agent any
+    tools {
+        maven 'Maven'
+    }
     stages {
+        stage("init") {
+            steps {
+                script {
+                    gv = load "script.groovy"
+                }
+            }
+        }
         stage("build jar") {
             steps {
-                echo "building the application..."
-                withMaven(maven: 'maven-3.9') {
-                    sh "mvn package"
+                script {
+                    buildJar()
                 }
             }
         }
         stage("build image") {
             steps {
-                echo "building the docker image..."
-                withCredentials([usernamePassword(credentialsId: 'docker-hub0repo-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-                    sh 'docker build -t tomiwa97/docker_app:jma-1.1 .'
-                    sh "echo $PASS | docker login -u $USER --password-stdin"
-                    sh 'docker push tomiwa97/docker_app:jma-1.1'
+                script {
+                    buildImage()
                 }
             }
         }
         stage("deploy") {
             steps {
-                echo 'deploying the application...'
+                script {
+                    gv.deployApp()
+                }
             }
         }
     }   
