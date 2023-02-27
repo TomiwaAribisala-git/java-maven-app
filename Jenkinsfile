@@ -34,7 +34,7 @@ pipeline {
         stage("deploy") {
             steps {
                 script {
-                    gv.deployApp():null
+                    gv.deployApp() : null
                 }
             }
         }
