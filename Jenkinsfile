@@ -45,5 +45,21 @@ pipeline {
                 }
             }
         }
+        stage("commit version update") {
+            steps {
+                script {
+                    echo "committing version update to git repository(to effect pom.xml file)..."
+                     withCredentials([usernamePassword(credentialsId: 'github-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+                         sh 'git status'
+                         sh 'git branch'
+                         sh 'git config --list'
+                         sh "git remote set-url origin https://${USER}:${PASS}github.com/TomiwaAribisala-git/java-maven-app.git"
+                         sh 'git add .'
+                         sh 'git commit -m "ci: version latest"'
+                         sh 'git push origin master'
+                     }
+                }
+            }
+        }
     }   
 }
