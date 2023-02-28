@@ -50,12 +50,12 @@ pipeline {
                 script {
                     echo "committing version update to git repository(to effect pom.xml file)..."
                      withCredentials([usernamePassword(credentialsId: 'github-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-                         sh 'git config user.email "jenkins@example.com"'
-                         sh 'git config user.name "jenkins"'
+                         sh 'git config --global user.email "jenkins@example.com"'
+                         sh 'git config --global user.name "jenkins"'
                          sh 'git status'
                          sh 'git branch'
                          sh 'git config --list'
-                         sh "git remote set-url origin https://${USER}:${PASS}@github.com/TomiwaAribisala-git/java-maven-app"
+                         sh "git remote set-url origin https://${USER}:${PASS}@github.com/TomiwaAribisala-git/java-maven-app.git"
                          sh 'git add .'
                          sh 'git commit -m "ci: version latest"'
                          sh 'git push origin HEAD:master'
