@@ -51,7 +51,7 @@ pipeline {
                     echo "committing version update to git repository(to effect pom.xml file)..."
                      withCredentials([usernamePassword(credentialsId: 'github-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
                          sh 'git config --global user.email "tomiwaaribisala@gmail.com"'
-                         sh 'git config --global user.name "TomiwaAribisala"'
+                         sh 'git config --global user.name "TomiwaAribisala-git"'
                          sh 'git status'
                          sh 'git branch'
                          sh 'git config --list'
