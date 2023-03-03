@@ -42,6 +42,10 @@ pipeline {
             steps {
                 script {
                     echo 'deploying the application...'
+                    def dockerCmd = 'docker run -p 3080:3080 tomiwa97/docker_app:1.1.1-34'
+                    sshagent(['ec2-server-credentials']) {
+                        sh "ssh -o StrictHostKeyChecking=no ec2-user@http://34.238.136.65 ${dockerCmd}"
+                    }
                 }
             }
         }
