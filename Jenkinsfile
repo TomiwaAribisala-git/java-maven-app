@@ -42,7 +42,6 @@ pipeline {
             steps {
                 script {
                     echo 'deploying the application...'
-                    }
                 }
             }
         }
