@@ -1,4 +1,4 @@
-# A CI/CD pipeline for a Java Maven application--(Jenkinsfile)[https://github.com/TomiwaAribisala-git/java-maven-app/blob/master/Jenkinsfile]. 
+# A CI/CD pipeline for a Java Maven application--[Jenkinsfile](https://github.com/TomiwaAribisala-git/java-maven-app/blob/master/Jenkinsfile). 
 
 1. Enabled jar-file and docker-image versioning, commit version update to remote repository.
 
