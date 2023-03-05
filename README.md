@@ -3,8 +3,8 @@
 1. Enabled jar-file and docker-image versioning, commit version update to remote repository.
 
 2. Built a Jar File of the application using maven(build tool) commands in Jenkins.
-3. 
-4. Built a Docker Image of the application using docker commands in Jenkins.
+
+3. Built a Docker Image of the application using docker commands in Jenkins.
 
 4. Pushed the Docker Image to a docker hub repository.
 
