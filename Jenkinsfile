@@ -16,7 +16,25 @@ pipeline {
                 }
             }
         }
-        stage("build jar") {
+        stage("commit version update") {
+            steps {
+                script {
+                    echo "committing version update to git repository(to effect pom.xml file)..."
+                     withCredentials([usernamePassword(credentialsId: 'github-pan-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+                         sh 'git config --global user.email "tomiwaaribisala@gmail.com"'
+                         sh 'git config --global user.name "TomiwaAribisala-git"'
+                         sh 'git status'
+                         sh 'git branch'
+                         sh 'git config --list'
+                         sh "git remote set-url origin https://${USER}:${PASS}@github.com/TomiwaAribisala-git/java-maven-app.git"
+                         sh 'git add .'
+                         sh 'git commit -m "ci: version latest"'
+                         sh 'git push origin HEAD:master'
+                     }
+                }
+            }
+        }
+        stage("build jar file") {
             steps {
                 script {
                     echo "building the application..."
@@ -38,7 +56,7 @@ pipeline {
                 }
             }
         }
-        stage("deploy") {
+        stage("deploy image") {
             steps {
                 script {
                     echo 'deploying docker image to EC2...'
@@ -46,24 +64,6 @@ pipeline {
                     sshagent(['ec2-server-key']) {
                        sh "ssh -o StrictHostKeyChecking=no ec2-user@3.86.146.152 ${dockerComposeCmd}"
                     }
-                }
-            }
-        }
-        stage("commit version update") {
-            steps {
-                script {
-                    echo "committing version update to git repository(to effect pom.xml file)..."
-                     withCredentials([usernamePassword(credentialsId: 'github-pan-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-                         sh 'git config --global user.email "tomiwaaribisala@gmail.com"'
-                         sh 'git config --global user.name "TomiwaAribisala-git"'
-                         sh 'git status'
-                         sh 'git branch'
-                         sh 'git config --list'
-                         sh "git remote set-url origin https://${USER}:${PASS}@github.com/TomiwaAribisala-git/java-maven-app.git"
-                         sh 'git add .'
-                         sh 'git commit -m "ci: version latest"'
-                         sh 'git push origin HEAD:master'
-                     }
                 }
             }
         }
