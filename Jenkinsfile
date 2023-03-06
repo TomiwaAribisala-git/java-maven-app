@@ -16,40 +16,6 @@ pipeline {
                 }
             }
         }
-        stage("build jar") {
-            steps {
-                script {
-                    echo "building the application..."
-                    withMaven(maven: 'maven-3.9') {
-                        sh "mvn clean package"
-                    }
-                }
-            }
-        }
-        stage("build image") {
-            steps {
-                script {
-                    echo "building the docker image..."
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub0repo-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-                        sh "docker build -t tomiwa97/docker_app:${IMAGE_NAME} ."
-                        sh "echo $PASS | docker login -u $USER --password-stdin"
-                        sh 'docker push tomiwa97/docker_app:${IMAGE_NAME}'
-                    }
-                }
-            }
-        }
-        stage("deploy") {
-            steps {
-                script {
-                    echo 'deploying docker image to EC2...'
-                    def dockerComposeCmd = "docker-compose -f docker-compose.yaml up --detach"
-                    sshagent(['ec2-server-key']) {
-                       sh "scp docker-compose.yaml ec2-user@3.86.146.152:/home/ec2-user" 
-                       sh "ssh -o StrictHostKeyChecking=no ec2-user@3.86.146.152 ${dockerComposeCmd}"
-                    }
-                }
-            }
-        }
         stage("commit version update") {
             steps {
                 script {
@@ -68,5 +34,39 @@ pipeline {
                 }
             }
         }
+        stage("build jar") {
+            steps {
+                script {
+                    echo "building the application..."
+                    withMaven(maven: 'maven-3.9') {
+                        sh "mvn clean package"
+                    }
+                }
+            }
+        }
+        stage("build docker image") {
+            steps {
+                script {
+                    echo "building the docker image..."
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub0repo-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+                        sh "docker build -t tomiwa97/docker_app:${IMAGE_NAME} ."
+                        sh "echo $PASS | docker login -u $USER --password-stdin"
+                        sh 'docker push tomiwa97/docker_app:${IMAGE_NAME}'
+                    }
+                }
+            }
+        }
+        stage("deploy docker image to ec2") {
+            steps {
+                script {
+                    echo 'deploying docker image to EC2...'
+                    def dockerComposeCmd = "docker-compose -f docker-compose.yaml up --detach"
+                    sshagent(['ec2-server-key']) {
+                       sh "scp docker-compose.yaml ec2-user@3.86.146.152:/home/ec2-user" 
+                       sh "ssh -o StrictHostKeyChecking=no ec2-user@3.86.146.152 ${dockerComposeCmd}"
+                    }
+                }
+            }
+        } 
     }   
 }
