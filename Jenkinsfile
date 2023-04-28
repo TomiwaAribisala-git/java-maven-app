@@ -59,7 +59,7 @@ pipeline {
         stage("deploy to k8s cluster") {
             steps {
                 script {
-                    echo 'deploying docker image to EC2...'
+                    echo 'deploying docker image to EKS Cluster...'
                 }
             }
         }
