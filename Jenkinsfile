@@ -27,9 +27,10 @@ pipeline {
                          sh 'git branch'
                          sh 'git config --list'
                          sh "git remote set-url origin https://${USER}:${PASS}@github.com/TomiwaAribisala-git/java-maven-app.git"
+                         sh 'git checkout -b feature1'
                          sh 'git add .'
                          sh 'git commit -m "ci: version latest"'
-                         sh 'git push origin HEAD:master'
+                         sh 'git push origin feature1'
                      }
                 }
             }
