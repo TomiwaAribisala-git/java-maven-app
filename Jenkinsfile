@@ -60,10 +60,6 @@ pipeline {
             steps {
                 script {
                     echo 'deploying docker image to EC2...'
-                    def dockerComposeCmd = 'docker run -p 3080:3080 -d tomiwa97/docker_app:1.1.1-34'
-                    sshagent(['ec2-server-key']) {
-                       sh "ssh -o StrictHostKeyChecking=no ec2-user@3.86.146.152 ${dockerComposeCmd}"
-                    }
                 }
             }
         }
