@@ -27,10 +27,9 @@ pipeline {
                          sh 'git branch'
                          sh 'git config --list'
                          sh "git remote set-url origin https://${USER}:${PASS}@github.com/TomiwaAribisala-git/java-maven-app.git"
-                         sh 'git checkout -b deploy-to-k8s'
                          sh 'git add .'
                          sh 'git commit -m "ci: version latest"'
-                         sh 'git push origin deploy-to-k8s'
+                         sh 'git push -f origin deploy-to-k8s'
                      }
                 }
             }
