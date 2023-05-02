@@ -8,4 +8,4 @@
 
 4. Pushed the Docker Image to a docker hub repository.
 
-5. Deployed Docker Image to AWS EKS Cluster
+5. Deployed Docker Image to AWS EKS Cluster.
