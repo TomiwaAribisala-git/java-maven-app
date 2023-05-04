@@ -10,4 +10,4 @@
 
 5. Provisioned a AWS EC2 Instance with Terraform.
 
-6. Deployed a docker-compose file containing the image to an AWS EC2 Instance.
+6. Deployed a docker-compose file containing the Docker image to an AWS EC2 Instance.
