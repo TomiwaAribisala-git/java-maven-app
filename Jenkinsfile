@@ -56,14 +56,35 @@ pipeline {
                 }
             }
         }
+        stage("provision ec2 instance") {
+            environment {
+                AWS_ACCESS_KEY_ID = credentials('jenkins_aws_access_key_id')
+                AWS_SECRET_ACCESS_KEY = credentials('jenkins_aws_secret_access_key')
+                AWS_REGION = credentials('jenkins_aws_region')
+            }
+            steps {
+                script {
+                    dir('terraform') {
+                        sh "terraform init"
+                        sh "terraform apply --auto-approve"
+                        EC2_PUBLIC_IP = sh(
+                            script: "terraform output ec2_public_ip"
+                            returnStdout: true
+                        ).trim()
+                    }
+                }
+            }
+        }
         stage("deploy docker image to ec2") {
             steps {
                 script {
+                    echo 'waiting for ec2 server to initialize'
+                    sleep(time: 180, unit: "SECONDS")
                     echo 'deploying docker image to EC2...'
                     def dockerComposeCmd = "docker-compose -f docker-compose.yaml up --detach"
                     sshagent(['ec2-server-key']) {
-                       sh "scp docker-compose.yaml ec2-user@3.86.146.152:/home/ec2-user" 
-                       sh "ssh -o StrictHostKeyChecking=no ec2-user@3.86.146.152 ${dockerComposeCmd}"
+                       sh "scp -o StrictHostKeyChecking=no docker-compose.yaml ec2-user@${EC2_PUBLIC_IP}:/home/ec2-user" 
+                       sh "ssh -o StrictHostKeyChecking=no ec2-user@${EC2_PUBLIC_IP} ${dockerComposeCmd}"
                     }
                 }
             }

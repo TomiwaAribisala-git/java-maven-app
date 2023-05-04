@@ -8,4 +8,6 @@
 
 4. Pushed the Docker Image to a docker hub repository.
 
-5. Deployed a docker-compose file containing the image to an AWS EC2 Instance.
+5. Provisioned a AWS EC2 Instance with Terraform.
+
+6. Deployed a docker-compose file containing the image to an AWS EC2 Instance.
