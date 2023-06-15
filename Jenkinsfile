@@ -48,10 +48,10 @@ pipeline {
             steps {
                 script {
                     echo "building the docker image..."
-                    withCredentials([usernamePassword(credentialsId: 'docker-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-                        sh "docker build -t tomiwa97/docker_app:${IMAGE_NAME} ."
-                        sh "echo $PASS | docker login -u $USER --password-stdin"
-                        sh 'docker push tomiwa97/docker_app:${IMAGE_NAME}'
+                    withCredentials([usernamePassword(credentialsId: 'ecr-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+                        sh "docker build -t 90452461819.dkr.ecr.us-east-1.amazonaws.com/java-maven-app:${IMAGE_NAME} ."
+                        sh "echo $PASS | docker login -u $USER --password-stdin 90452461819.dkr.ecr.us-east-1.amazonaws.com"
+                        sh 'docker push 90452461819.dkr.ecr.us-east-1.amazonaws.com/java-maven-app:${IMAGE_NAME}'
                     }
                 }
             }
