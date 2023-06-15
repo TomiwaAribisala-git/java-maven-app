@@ -6,6 +6,6 @@
 
 3. Built a Docker Image of the application using docker commands in Jenkins.
 
-4. Pushed the Docker Image to a docker hub repository.
+4. Pushed the Docker Image to a AWS ECR repository.
 
 5. Deployed Docker Image to AWS EKS Cluster.
