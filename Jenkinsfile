@@ -1,68 +1,37 @@
 pipeline {
     agent any
+    environment {
+        ANSIBLE_SERVER = "167.99.136.157"
+    }
     stages {
-        stage("increment version") {
-            steps{
-                script {
-                    echo "incrementing app version..."
-                    withMaven(maven: 'maven-3.9') {
-                        sh 'mvn build-helper:parse-version versions:set \
-                        -DnewVersion=\\\${parsedVersion.majorVersion}.\\\${parsedVersion.minorVersion}.\\\${parsedVersion.nextIncrementalVersion} \
-                        versions:commit'
-                    def matcher = readFile('pom.xml') =~ '<version>(.+)</version>'
-                    def version = matcher[0][1] 
-                    env.IMAGE_NAME = "$version-$BUILD_NUMBER"  
-                    }            
-                }
-            }
-        }
-        stage("commit version update") {
+        stage("copy files to ansible server") {
             steps {
                 script {
-                    echo "committing version update to git repository(to effect pom.xml file)..."
-                     withCredentials([usernamePassword(credentialsId: 'github-pan-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-                         sh 'git config --global user.email "tomiwaaribisala@gmail.com"'
-                         sh 'git config --global user.name "TomiwaAribisala-git"'
-                         sh 'git status'
-                         sh 'git branch'
-                         sh 'git config --list'
-                         sh "git remote set-url origin https://${USER}:${PASS}@github.com/TomiwaAribisala-git/java-maven-app.git"
-                         sh 'git add .'
-                         sh 'git commit -m "ci: version latest"'
-                         sh 'git push origin HEAD:master'
-                     }
-                }
-            }
-        }
-        stage("build jar file") {
-            steps {
-                script {
-                    echo "building the application..."
-                    withMaven(maven: 'maven-3.9') {
-                        sh "mvn clean package"
+                    echo "copying all neccessary files to ansible control node"
+                    sshagent(['ansible-server-key']) {
+                        sh "scp -o StrictHostKeyChecking=no ansible/* root@${ANSIBLE_SERVER}:/root"
+
+                        withCredentials([sshUserPrivateKey(credentialsId: 'ec2-server-key', keyFileVariable: 'keyfile', usernameVariable: 'user')]) {
+                            sh 'scp $keyfile root@$ANSIBLE_SERVER:/root/ssh-key.pem'
+                        }
                     }
                 }
             }
         }
-        stage("build image") {
+        stage("execute ansible playbook") {
             steps {
                 script {
-                    echo "building the docker image..."
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub0repo-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-                        sh "docker build -t tomiwa97/docker_app:${IMAGE_NAME} ."
-                        sh "echo $PASS | docker login -u $USER --password-stdin"
-                        sh 'docker push tomiwa97/docker_app:${IMAGE_NAME}'
-                    }
-                }
-            }
-        }
-        stage("deploying image to EC2") {
-            steps {
-                script {
-                    echo 'deploying docker image to EC2...'
-                    def dockerComposeCmd = 'docker run -p 3080:3080 -d tomiwa97/docker_app:1.1.1-34'
-                    sshagent(['ec2-server-key']) {
-                       sh "ssh -o StrictHostKeyChecking=no ec2-user@3.86.146.152 ${dockerComposeCmd}"
+                    echo "calling ansible playbook to configure ec2 instances"
+                    def remote = [:]
+                    remote.name = "ansible-server"
+                    remote.host = ANSIBLE_SERVER
+                    remote.allowAnyHosts = true
+
+                    withCredentials([sshUserPrivateKey(credentialsId: 'ansible-server-key', keyFileVariable: 'keyfile', usernameVariable: 'user')]){
+                        remote.user = user
+                        remote.identityFile = keyfile
+                        sshScript remote: remote, script: "prepare-ansible-server.sh"
+                        sshCommand remote: remote, command: "ansible-playbook my-playbook.yaml"
                     }
                 }
             }
